@@ -191,13 +191,13 @@ function rads(deg) {
 }
 
 function roundByStep(value, step) {
-    step || (step = 1.0);
-    var inv = 1.0 / step;
-    return Math.round(value * inv) / inv;
+  step || (step = 1.0);
+  var inv = 1.0 / step;
+  return Math.round(value * inv) / inv;
 }
 
 function midiToSpeed(ogmidi, destmidi) {
-  var tspeed = Math.pow( 2, (ogmidi - destmidi) * (1.0 / 12.0) );
+  var tspeed = Math.pow(2, (ogmidi - destmidi) * (1.0 / 12.0));
   return tspeed;
 }
 
@@ -206,4 +206,67 @@ function limitRange(num, min, max) {
   tnewval = Math.min(num, max);
   tnewval = Math.max(tnewval, min);
   return tnewval;
+}
+
+
+function stringTo3DFloatArray(text) {
+  var pitchesArray1 = [];
+  var t1 = text.split(":");
+  for (var i = 0; i < t1.length; i++) {
+    var temparr = t1[i].split(';');
+    var t3 = [];
+    for (var j = 0; j < temparr.length; j++) {
+      var temparr2 = temparr[j].split("&");
+      var t4 = [];
+      for (var k = 0; k < temparr2.length; k++) {
+        t4.push(temparr2[k].split(","));
+      }
+      var tnewFloatArr = [];
+      for (var l = 0; l < t4.length; l++) {
+        tnewFloatArr.push(parseFloat(t4[l]));
+      }
+      t3.push(tnewFloatArr);
+    }
+    pitchesArray1.push(t3);
+  }
+  return pitchesArray1;
+}
+
+function distributeOverRange(min, max, numVals){
+  var trange = max - min;
+  var tinc = trange/numVals;
+  var tvals = [];
+  for(var i=0;i<numVals;i++){
+    tvals.push( min + rrand( (i*tinc), ( (i+1) * tinc )  ) );
+  }
+  return tvals;
+}
+
+function plot(fn, range) {
+  var widthScale = (width / (range[1] - range[0])),
+    heightScale = (height / (range[3] - range[2])),
+    first = true;
+
+  ctx.beginPath();
+
+  for (var x = 0; x < width; x++) {
+    var xFnVal = (x / widthScale) - range[0],
+      yGVal = (fn(xFnVal) - range[2]) * heightScale;
+
+    yGVal = height - yGVal; // 0,0 is top-left
+
+    if (first) {
+      ctx.moveTo(x, yGVal);
+      first = false;
+      coord.push(yGVal);
+    } else {
+      ctx.lineTo(x, yGVal);
+      coord.push(yGVal);
+    }
+  }
+
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  console.log(coord);
 }
